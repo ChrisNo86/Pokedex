@@ -1,0 +1,21 @@
+// main.js oder extra file
+export const typeColors = {
+  fire: "#ff6b6b",
+  water: "#4dabf7",
+  grass: "#51cf66",
+  electric: "#ffd43b",
+  psychic: "#f783ac",
+  ice: "#66d9e8",
+  dragon: "#845ef7",
+  dark: "#343a40",
+  fairy: "#fcc2d7",
+  normal: "#adb5bd",
+  fighting: "#ff922b",
+  flying: "#74c0fc",
+  poison: "#da77f2",
+  ground: "#c92a2a",
+  rock: "#868e96",
+  bug: "#82c91e",
+  ghost: "#5f3dc4",
+  steel: "#ced4da"
+};
