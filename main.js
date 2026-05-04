@@ -209,11 +209,11 @@ function switchTabWithPokemon(tab, pokemon) {
 window.loadMore = async function() {
   const btn = document.getElementById("load-more");
 
+  btn.classList.add("loading");
   btn.disabled = true;
-  btn.innerHTML = "Loading...";
 
   await loadPokemon();
 
+  btn.classList.remove("loading");
   btn.disabled = false;
-  btn.innerHTML = "<span>Mehr laden</span>";
 };
