@@ -30,13 +30,17 @@
 
     <div class="controls">
 
- <button id="load-more" onclick="loadMore()">
-  <span class="btn-text">Mehr laden</span>
-  <span class="btn-loader"></span>
-</button>
+<div class="load-container">
+  <button id="load-more" onclick="loadMore()">
+    <span class="btn-text">Mehr laden</span>
+    <span class="btn-loader"></span>
+  </button>
+</div>
 
-    <div id="loader"></div>
-  </div>
+   <div id="loader-text">
+  <span class="spinner"></span>
+  ⚡ Loading...
+</div>
 
   <div id="overlay" onclick="closeOverlay()"></div>
   <button onclick="switchTab('stats')" class="tab" data-tab="stats"></button>

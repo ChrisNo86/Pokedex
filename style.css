@@ -609,55 +609,63 @@ body::before {
 
 #load-more {
   position: relative;
-  margin: 40px auto;
+
+  width: 200px;
+  height: 52px;
+
   display: flex;
   align-items: center;
   justify-content: center;
 
-  min-width: 160px; /* 🔥 verhindert Springen */
-  height: 48px;
-
-  padding: 0 20px;
-
   border: none;
   border-radius: 14px;
 
+  background: linear-gradient(135deg, #00ffff, #3b82f6);
   color: white;
   cursor: pointer;
 
-  background: linear-gradient(135deg, #00ffff, #3b82f6);
+  font-size: 16px;
+  font-weight: 600;
 
   transition: 0.25s;
 }
 
-/* Text */
 .btn-text {
-  transition: opacity 0.2s ease;
+  position: absolute;
+  transition: opacity 0.2s;
 }
 
-/* Loader */
+.btn-text {
+  pointer-events: none;
+}
+
+/* 🔥 Loader rechts positioniert */
 .btn-loader {
   position: absolute;
-  width: 18px;
-  height: 18px;
+  right: 16px;
 
-  border: 2px solid white;
-  border-top: 2px solid transparent;
+  width: 22px; /* größer */
+  height: 22px;
+
+  border: 3px solid white;
+  border-top: 3px solid transparent;
   border-radius: 50%;
 
   opacity: 0;
-  animation: spin 0.6s linear infinite;
+  animation: spin 0.7s linear infinite;
 }
 
 /* Loading State */
-#load-more.loading .btn-text {
-  opacity: 0;
-}
-
 #load-more.loading .btn-loader {
   opacity: 1;
 }
 
+/* Optional: Text leicht dimmen beim Laden */
+#load-more.loading .btn-text {
+  opacity: 0.7;
+}
+
+/* Animation */
 @keyframes spin {
   to {
     transform: rotate(360deg);
@@ -684,4 +692,61 @@ body::before {
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
+}
+
+#load-more.loading {
+  filter: brightness(1.2);
+}
+
+.load-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin: 40px 0;
+}
+
+/* Loader Text */
+#loader-text {
+  font-size: 16px;
+  opacity: 0;
+  transform: translateX(-10px);
+
+  transition: 0.2s;
+  white-space: nowrap;
+}
+
+/* sichtbar */
+#loader-text.active {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Animation */
+@keyframes pulse {
+  0% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.5;
+  }
+}
+
+#loader-text.active {
+  animation: pulse 1s infinite;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid white;
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 6px;
+  animation: spin 0.6s linear infinite;
 }

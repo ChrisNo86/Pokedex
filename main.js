@@ -91,8 +91,16 @@ function renderList(pokemonArray) {
   });
 }
 
-function toggleLoading(state) {
-  document.getElementById('loader').classList.toggle('active', state);
+function toggleLoading(show) {
+  const loader = document.getElementById("loader-text");
+
+  if (!loader) return; // 🔥 Sicherheitscheck
+
+  if (show) {
+    loader.classList.add("active");
+  } else {
+    loader.classList.remove("active");
+  }
 }
 
 window.openOverlay = function(id) {
@@ -128,7 +136,6 @@ async function loadEvolution(pokemon) {
 
   const evoData = await fetchEvolutionChain(pokemon.species.url);
 
-  // 🔥 verhindert falsche Chains beim schnellen klicken
   if (allPokemon[currentIndex].id !== requestId) return;
 
   const list = extractEvolutionChainDetailed(evoData.chain);
@@ -150,7 +157,7 @@ window.switchTab = function(tab) {
 
   if (tab === "evo") {
     container.innerHTML = "Loading...";
-    loadEvolution(pokemon); // 🔥 DAS ist die einzige Quelle
+    loadEvolution(pokemon);
   }
 };
 
@@ -206,12 +213,18 @@ function switchTabWithPokemon(tab, pokemon) {
   updateActiveTab(tab);
 }
 
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 window.loadMore = async function() {
   const btn = document.getElementById("load-more");
+  const loader = document.getElementById("loader-text");
 
   btn.classList.add("loading");
   btn.disabled = true;
 
+  await delay(1000);
   await loadPokemon();
 
   btn.classList.remove("loading");
