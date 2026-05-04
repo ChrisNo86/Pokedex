@@ -63,17 +63,14 @@ export function renderOverlay(pokemon) {
       <img class="overlay-img"
            src="${pokemon.sprites.other['official-artwork'].front_default}">
 
-      <!-- 🔥 TABS -->
       <div class="tabs">
-        <button class="tab active" onclick="switchTab('stats')" data-tab="stats">Stats</button>
-        <button class="tab" onclick="switchTab('info')" data-tab="info">Info</button>
-        <button class="tab" onclick="switchTab('evo')" data-tab="evo">Evolution</button>
+        <button onclick="switchTab('about')">About</button>
+        <button onclick="switchTab('stats')">Base Stats</button>
+        <button onclick="switchTab('evo')">Evolution</button>
+        <button onclick="switchTab('moves')">Moves</button>
       </div>
 
-      <!-- 🔥 CONTENT -->
-      <div id="tab-content">
-        ${renderStats(pokemon)}
-      </div>
+      <div id="tab-content"></div>
 
       <div class="overlay-nav">
         <button onclick="prevPokemon()">◀</button>
@@ -84,28 +81,82 @@ export function renderOverlay(pokemon) {
   `;
 }
 
+export function renderAbout(pokemon) {
+  const height = pokemon.height / 10;
+  const weight = pokemon.weight / 10;
+
+  const abilities = pokemon.abilities
+    .map(a => a.ability.name)
+    .join(", ");
+
+  return `
+    <div class="about">
+
+      <!-- MAIN INFO -->
+      <div class="about-section">
+        <div class="about-row">
+          <span>Species</span>
+          <span>Seed</span>
+        </div>
+
+        <div class="about-row">
+          <span>Height</span>
+          <span>${height} m</span>
+        </div>
+
+        <div class="about-row">
+          <span>Weight</span>
+          <span>${weight} kg</span>
+        </div>
+
+        <div class="about-row">
+          <span>Abilities</span>
+          <span>${abilities}</span>
+        </div>
+      </div>
+
+      <!-- BREEDING -->
+      <div class="about-section">
+
+        <h4 class="section-title">Breeding</h4>
+
+        <div class="about-row">
+          <span>Gender</span>
+          <span>♂ 87.5% / ♀ 12.5%</span>
+        </div>
+
+        <div class="about-row">
+          <span>Egg Groups</span>
+          <span>Monster</span>
+        </div>
+
+        <div class="about-row">
+          <span>Egg Cycle</span>
+          <span>Grass</span>
+        </div>
+
+      </div>
+
+    </div>
+  `;
+}
+
 export function renderEvolution(pokemonList) {
   return `
     <div class="evo-chain">
-      ${pokemonList.map((p, index) => {
-        const name = p?.name || "unknown";
-        const id = p?.id || 0;
+      ${pokemonList.map((p, index) => `
+        <div class="evo-item" onclick="openFromEvolution(${p.id})">
 
-        return `
-          <div class="evo-item" onclick="openFromEvolution(${id})">
+          <img src="${p.sprites.other['official-artwork'].front_default}"
+            alt="${p.name}"
+          >
 
-            <img 
-              src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png"
-              alt="${name}"
-            >
+          <span>${p.name.toUpperCase()}</span>
 
-            <span>${name.toUpperCase()}</span>
+        </div>
 
-          </div>
-
-          ${index < pokemonList.length - 1 ? '<div class="arrow">➜</div>' : ''}
-        `;
-      }).join("")}
+        ${index < pokemonList.length - 1 ? '<div class="arrow">➜</div>' : ''}
+      `).join("")}
     </div>
   `;
 }
@@ -113,22 +164,47 @@ export function renderEvolution(pokemonList) {
 export function renderStats(pokemon) {
   return `
     <div class="stats-container">
-      ${(pokemon.stats || []).map(stat => {
+
+      ${pokemon.stats.map(stat => {
         const value = stat.base_stat;
-        const label = stat.stat.name.toUpperCase();
+        const name = formatStatName(stat.stat.name);
 
         return `
-          <div class="stat">
-            <span>${label}</span>
+          <div class="stat-row">
+
+            <span class="stat-name">${name}</span>
+
             <div class="bar">
-              <div class="fill" style="width: ${value / 2}%"></div>
+              <div class="fill" style="width:${value / 2}%"></div>
             </div>
-            <span>${value}</span>
+
+            <span class="stat-value">${value}</span>
+
           </div>
         `;
       }).join("")}
+
     </div>
   `;
+}
+
+export function renderMoves(pokemon) {
+  return `
+    <div class="moves">
+
+      ${pokemon.moves.slice(0, 20).map(m => `
+        <span class="move">${m.move.name}</span>
+      `).join("")}
+
+    </div>
+  `;
+}
+
+function formatStatName(name) {
+  return name
+    .replace("special-attack", "Sp. Atk")
+    .replace("special-defense", "Sp. Def")
+    .toUpperCase();
 }
 
 export function renderInfo(pokemon) {

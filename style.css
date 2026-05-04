@@ -5,7 +5,6 @@ body {
     radial-gradient(circle at 20% 20%, rgba(0, 255, 255, 0.08), transparent),
     radial-gradient(circle at 80% 80%, rgba(255, 0, 255, 0.08), transparent),
     linear-gradient(160deg, #020617, #000);
-
   color: white;
 }
 
@@ -318,12 +317,21 @@ body::before {
   flex-wrap: wrap;
 }
 
+.active-evo {
+  box-shadow: 0 0 12px cyan;
+}
+
 .evo-item {
   display: flex;
   flex-direction: column;
   align-items: center;
   cursor: pointer;
   transition: 0.2s;
+}
+
+.evo-item:hover {
+  transform: scale(1.1);
+  filter: brightness(1.2);
 }
 
 .evo-item:hover img {
@@ -516,6 +524,8 @@ body::before {
 
 .controls {
   max-width: 1440px;
+  width: 100%;
+  box-sizing: border-box;
   margin: auto;
   padding: 20px;
   display: flex;
@@ -547,28 +557,6 @@ body::before {
 }
 
 .type-filter button:hover {
-  background: #00ffff;
-  color: black;
-}
-
-.tabs {
-  display: flex;
-  gap: 8px;
-  margin: 15px 0;
-}
-
-.tab {
-  flex: 1;
-  padding: 10px;
-  border: none;
-  border-radius: 10px;
-  background: #0f172a;
-  color: white;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.tab.active {
   background: #00ffff;
   color: black;
 }
@@ -740,13 +728,172 @@ body::before {
   animation: pulse 1s infinite;
 }
 
-.spinner {
-  width: 16px;
-  height: 16px;
-  border: 2px solid white;
-  border-top: 2px solid transparent;
-  border-radius: 50%;
-  display: inline-block;
+#loader-text::before {
   margin-right: 6px;
-  animation: spin 0.6s linear infinite;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0;
+  background: #020617;
+  padding: 6px;
+  border-radius: 12px;
+}
+
+.tabs button {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tabs button:hover {
+  background: #1e293b;
+  color: white;
+}
+
+/* Tabs ACTIVE State */
+.tabs button.active,
+.tabs button[data-active="true"] {
+  background: linear-gradient(135deg, #00ffff, #3b82f6);
+  color: white;
+  box-shadow: 0 0 12px rgba(0, 255, 255, 0.4);
+  font-weight: 600;
+}
+
+/* ABOUT */
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 12px;
+  margin-bottom: 12px;
+}
+
+/* STATS */
+.stat-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0;
+}
+
+.stat-name {
+  width: 80px;
+  font-size: 12px;
+}
+
+.bar {
+  flex: 1;
+  height: 6px;
+  background: #1e293b;
+  border-radius: 10px;
+}
+
+.fill {
+  height: 100%;
+  background: linear-gradient(90deg, cyan, blue);
+  border-radius: 10px;
+}
+
+.stat-value {
+  width: 30px;
+  text-align: right;
+}
+
+/* MOVES */
+.moves {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.move {
+  background: #1e293b;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.about {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.about-section {
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.about-section:last-child {
+  border-bottom: none;
+}
+
+.about-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 12px;
+}
+
+.about-row span:first-child {
+  color: #fff;
+  opacity: 0.7;
+}
+
+.about-row span:last-child {
+  color: #fff;
+}
+
+.section-title {
+  font-size: 12px;
+  opacity: 0.8;
+  margin: 4px 0;
+}
+
+.type-filter {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 10px;
+}
+
+.type-btn {
+  width: 40px;
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+  border: none;
+
+  background: #020617;
+  cursor: pointer;
+
+  transition: all 0.2s;
+}
+
+.type-btn img {
+  width: 20px;
+  height: 20px;
+}
+
+/* HOVER */
+.type-btn:hover {
+  transform: scale(1.1);
+  background: #0f172a;
+}
+
+/* ACTIVE */
+.type-btn.active {
+  background: linear-gradient(135deg, cyan, #3b82f6);
+  box-shadow: 0 0 12px rgba(0, 255, 255, 0.7);
+  transform: scale(1.15);
 }

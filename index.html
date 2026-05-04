@@ -15,14 +15,7 @@
     oninput="onSearchInput(this)"
   >
 
-  <div class="type-filter">
-    <button onclick="onTypeChange('all')">All</button>
-    <button onclick="onTypeChange('fire')">Fire</button>
-    <button onclick="onTypeChange('water')">Water</button>
-    <button onclick="onTypeChange('grass')">Grass</button>
-    <button onclick="onTypeChange('electric')">Electric</button>
-    <button onclick="onTypeChange('ghost')">Ghost</button>
-  </div>
+ <div class="type-filter" id="type-filter"></div>
 
 </div>
   <div id="app">
@@ -31,19 +24,11 @@
     <div class="controls">
 
 <div class="load-container">
-  <button id="load-more" onclick="loadMore()">
-    <span class="btn-text">Mehr laden</span>
-    <span class="btn-loader"></span>
-  </button>
-</div>
-
-   <div id="loader-text">
-  <span class="spinner"></span>
-  ⚡ Loading...
+  <button id="load-more" onclick="loadMore()">Mehr laden</button>
+  <div id="loader-text">⚡ Loading...</div>
 </div>
 
   <div id="overlay" onclick="closeOverlay()"></div>
-  <button onclick="switchTab('stats')" class="tab" data-tab="stats"></button>
 
   <script type="module" src="main.js"></script>
 </body>
