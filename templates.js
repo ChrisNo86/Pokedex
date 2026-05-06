@@ -81,7 +81,7 @@ export function renderOverlay(pokemon) {
   `;
 }
 
-export function renderAbout(pokemon) {
+export function renderAbout(pokemon, speciesData) {
   const height = pokemon.height / 10;
   const weight = pokemon.weight / 10;
 
@@ -89,14 +89,34 @@ export function renderAbout(pokemon) {
     .map(a => a.ability.name)
     .join(", ");
 
+  const genderRate = speciesData.gender_rate;
+
+  const femaleRate = genderRate >= 0
+    ? genderRate * 12.5
+    : 0;
+
+  const maleRate = genderRate >= 0
+    ? 100 - femaleRate
+    : 0;
+
+  const eggGroups = speciesData.egg_groups
+    .map(group => group.name)
+    .join(", ");
+
+  const eggCycles = speciesData.hatch_counter;
+
+  const genus = speciesData.genera.find(
+    g => g.language.name === "en"
+  )?.genus || "Unknown";
+
   return `
     <div class="about">
 
-      <!-- MAIN INFO -->
       <div class="about-section">
+
         <div class="about-row">
           <span>Species</span>
-          <span>Seed</span>
+          <span>${genus}</span>
         </div>
 
         <div class="about-row">
@@ -113,26 +133,31 @@ export function renderAbout(pokemon) {
           <span>Abilities</span>
           <span>${abilities}</span>
         </div>
+
       </div>
 
-      <!-- BREEDING -->
       <div class="about-section">
 
-        <h4 class="section-title">Breeding</h4>
+        <h4 class="section-title">
+          Breeding
+        </h4>
 
         <div class="about-row">
           <span>Gender</span>
-          <span>♂ 87.5% / ♀ 12.5%</span>
+
+          <span>
+            ♂ ${maleRate}% / ♀ ${femaleRate}%
+          </span>
         </div>
 
         <div class="about-row">
           <span>Egg Groups</span>
-          <span>Monster</span>
+          <span>${eggGroups}</span>
         </div>
 
         <div class="about-row">
           <span>Egg Cycle</span>
-          <span>Grass</span>
+          <span>${eggCycles}</span>
         </div>
 
       </div>

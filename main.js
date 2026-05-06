@@ -15,7 +15,10 @@ import {
   renderAbout
 } from './templates.js';
 
-import { getTypeIcon } from './utils.js';
+import {
+  getTypeIcon,
+  pokemonTypes
+} from './utils.js';
 
 
 /* ================= STATE ================= */
@@ -34,7 +37,10 @@ let activeTab = "stats";
 
 /* ================= INIT ================= */
 
-window.onload = () => loadPokemon();
+window.onload = () => {
+  renderTypeFilter();
+  loadPokemon();
+};
 
 /* ================= LOAD ================= */
 
@@ -56,13 +62,13 @@ function renderTypeFilter() {
   const container = document.getElementById("type-filter");
 
   container.innerHTML = pokemonTypes.map(type => `
-    <button 
+    <button
       class="type-btn ${type === selectedType ? "active" : ""}"
       onclick="onTypeChange('${type}')"
       title="${type}"
     >
-      ${type === "all" 
-        ? "🌐" 
+      ${type === "all"
+        ? "🌐"
         : `<img src="${getTypeIcon(type)}" alt="${type}">`}
     </button>
   `).join("");
@@ -174,14 +180,20 @@ function getCurrentPokemon() {
 }
 
 
-function renderOverlayUI(pokemon) {
+async function renderOverlayUI(pokemon) {
   const overlay = document.getElementById("overlay");
 
   overlay.innerHTML = renderOverlay(pokemon);
+
   overlay.classList.add("show");
 
   document.body.style.overflow = "hidden";
-  switchTab("stats");
+
+  await switchTab("about");
+
+  requestAnimationFrame(() => {
+    overlay.style.opacity = "1";
+  });
 }
 
 
@@ -200,9 +212,14 @@ window.switchTab = async (tab) => {
   
   setActiveTabUI(tab);
 
-  if (tab === "about") {
-    content.innerHTML = renderAbout(pokemon);
-  }
+ if (tab === "about") {
+  const speciesData = await fetchSpeciesData(pokemon);
+
+  content.innerHTML = renderAbout(
+    pokemon,
+    speciesData
+  );
+}
 
   if (tab === "stats") {
     content.innerHTML = renderStats(pokemon);
@@ -227,6 +244,11 @@ function setActiveTabUI(tab) {
   });
 }
 
+async function fetchSpeciesData(pokemon) {
+  const response = await fetch(pokemon.species.url);
+  return await response.json();
+}
+
 /* ================= EVOLUTION ================= */
 
 async function loadEvolutionUI(pokemon) {
@@ -235,9 +257,20 @@ async function loadEvolutionUI(pokemon) {
   }
 
   const evoData = await fetchEvolutionChain(pokemon.species.url);
+
   const chain = extractEvolutionChainDetailed(evoData.chain);
 
-  return renderEvolution(chain);
+const fullPokemonData = await Promise.all(
+  chain.map(async evo => {
+    const response = await fetch(
+      `https://pokeapi.co/api/v2/pokemon/${evo.name}`
+    );
+
+    return await response.json();
+  })
+);
+
+  return renderEvolution(fullPokemonData);
 }
 
 
@@ -266,20 +299,32 @@ function setLoading(state) {
 
 
 function toggleLoader(show) {
-  const loader = document.getElementById("loader");
+  const loader = document.getElementById("loader-text");
+
   if (!loader) return;
 
-  loader.classList.toggle("active", show);
+  loader.style.display = show
+    ? "block"
+    : "none";
 }
 
 
 window.loadMore = async () => {
   if (isLoading) return;
 
-  await delay(2000);
-  await loadPokemon();
-};
+  const button = document.getElementById("load-more");
+  const loader = document.getElementById("loader-text");
 
+  button.disabled = true;
+  loader.style.display = "block";
+
+  await delay(2000);
+
+  await loadPokemon();
+
+  loader.style.display = "none";
+  button.disabled = false;
+};
 /* ================= UTILS ================= */
 
 function debounce(fn, delay) {
@@ -304,7 +349,7 @@ window.openFromEvolution = (id) => {
 
   const pokemon = getCurrentPokemon();
   renderOverlayUI(pokemon);
-  switchTab("stats");
+  switchTab("about");
 
   showOverlay();
 };
