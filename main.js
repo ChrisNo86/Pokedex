@@ -150,7 +150,6 @@ window.onTypeChange = type => {
   selectedType = type;
   renderFilteredList();
   renderTypeFilter();
-  loadPokemon();
 };
 
 
