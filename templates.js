@@ -114,6 +114,10 @@ export function renderAbout(pokemon, speciesData) {
 
       <div class="about-section">
 
+      <h4 class="section-title">
+  Pokédex Data
+</h4>
+
         <div class="about-row">
           <span>Species</span>
           <span>${genus}</span>
