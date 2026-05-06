@@ -621,6 +621,56 @@ body::before {
   color: black;
 }
 
+.filter-toggle {
+  display: none;
+
+  width: 100%;
+  padding: 14px;
+
+  border: none;
+  border-radius: 16px;
+
+  background: rgba(255, 255, 255, 0.08);
+
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  backdrop-filter: blur(10px);
+
+  margin-top: 12px;
+}
+
+@media (max-width: 1000px) {
+  .filter-toggle {
+    display: block;
+  }
+
+  .type-filter {
+    display: none;
+
+    flex-wrap: wrap;
+    justify-content: center;
+
+    gap: 10px;
+
+    margin-top: 14px;
+    padding: 16px;
+
+    border-radius: 20px;
+
+    background: rgba(255, 255, 255, 0.06);
+
+    backdrop-filter: blur(12px);
+  }
+
+  .type-filter.show {
+    display: flex;
+  }
+}
+
 /* INFO */
 .info {
   text-align: left;

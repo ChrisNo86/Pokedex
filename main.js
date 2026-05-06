@@ -134,6 +134,11 @@ function matchesType(pokemon) {
     pokemon.types.some(t => t.type.name === selectedType);
 }
 
+window.toggleFilterMenu = () => {
+  const filter = document.getElementById("type-filter");
+
+  filter.classList.toggle("show");
+};
 
 /* ================= SEARCH ================= */
 
