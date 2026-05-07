@@ -52,7 +52,7 @@ The project focuses on:
 Example:
 
 ![Project Preview](./assets/img/preview.png)
-
+![Project Preview](./assets/img/preview2.png)
 ---
 
 ## ⚙️ Installation
