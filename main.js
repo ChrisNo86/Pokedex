@@ -1,5 +1,6 @@
 import {
   fetchPokemonList,
+  fetchPokemonById,
   fetchPokemonDetails
 } from './js/api.js';
 
@@ -73,6 +74,10 @@ async function loadPokemonList() {
   toggleLoader(initialLoad, false);
 
   appState.isLoading = false;
+}
+
+function getActivePokemonList() {
+  return getFilteredPokemon();
 }
 
 function isInitialLoad() {
@@ -292,7 +297,12 @@ function registerGlobalFunctions() {
 }
 
 function registerOverlayFunctions() {
-  window.openOverlay = openOverlay;
+  window.openOverlay = pokemonId => {
+  openOverlay(
+    pokemonId,
+    getActivePokemonList()
+  );
+};
 
   window.closeOverlay = closePokemonOverlay;
 
@@ -338,10 +348,13 @@ async function changePokemon(direction) {
   await showPokemonOverlay(appState.allPokemon);
 }
 
-function openOverlay(pokemonId) {
+function openOverlay(
+  pokemonId,
+  pokemonList
+) {
   openPokemonOverlay(
     pokemonId,
-    appState.allPokemon
+    pokemonList
   );
 }
 
@@ -353,19 +366,34 @@ async function switchOverlay(tab) {
 }
 
 async function openEvolutionPokemon(
-  pokemonId
+  item,
+  allPokemon
 ) {
 
-  const index = findPokemonIndex(
-    pokemonId
-  );
+  const id =
+    Number(item.dataset.evo);
 
-  if (index === -1) return;
+  let pokemon =
+    findPokemonById(id);
 
-  appState.currentIndex = index;
+  if (!pokemon) {
+    pokemon =
+      await fetchPokemonById(id);
 
-  await showPokemonOverlay(
+    appState.allPokemon.push(
+      pokemon
+    );
+  }
+
+  openPokemonOverlay(
+    id,
     appState.allPokemon
+  );
+}
+
+function findPokemonById(id) {
+  return appState.allPokemon.find(
+    pokemon => pokemon.id === id
   );
 }
 
@@ -376,38 +404,21 @@ function findPokemonIndex(pokemonId) {
 }
 
 async function loadMorePokemon() {
-
-  const button =
-    document.getElementById(
-      'load-more'
-    );
-
-  const loader =
-    document.getElementById(
-      'loader-text'
-    );
-
-  button.disabled = true;
-
-  button.classList.add(
-    'loading'
-  );
-
-  loader.style.display =
-    'block';
+  toggleLoadButton(true);
 
   await delay(2000);
 
   await loadPokemonList();
 
-  button.disabled = false;
+  toggleLoadButton(false);
+}
 
-  button.classList.remove(
-    'loading'
-  );
-
-  loader.style.display =
-    'none';
+function toggleLoadButton(isLoading) {
+  const button = document.getElementById('load-more');
+  const loader = document.getElementById('loader-text');
+  button.disabled = isLoading;
+  button.classList.toggle('loading', isLoading);
+  loader.style.display = isLoading ? 'block' : 'none';
 }
 
 function initializeCardEvents() {

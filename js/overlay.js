@@ -23,12 +23,24 @@ import {
 
 import { appState } from './state.js';
 
-export function openPokemonOverlay(pokemonId, allPokemon) {
-  appState.currentIndex = allPokemon.findIndex(
-    pokemon => pokemon.id === pokemonId
-  );
+export function openPokemonOverlay(
+  pokemonId,
+  allPokemon
+) {
 
-  showPokemonOverlay(allPokemon);
+  const pokemonList =
+    allPokemon.length
+      ? allPokemon
+      : appState.allPokemon;
+
+  appState.currentIndex =
+    pokemonList.findIndex(
+      pokemon => pokemon.id === pokemonId
+    );
+
+  showPokemonOverlay(
+    pokemonList
+  );
 }
 
 export function closePokemonOverlay() {
@@ -410,12 +422,9 @@ async function renderAboutTab(
   pokemon,
   content
 ) {
-  const response = await fetch(
-    pokemon.species.url
-  );
 
   const species =
-    await response.json();
+    await fetchSpecies(pokemon);
 
   const data =
     createAboutData(
@@ -425,6 +434,14 @@ async function renderAboutTab(
 
   content.innerHTML =
     renderAbout(data);
+}
+
+async function fetchSpecies(pokemon) {
+  const response = await fetch(
+    pokemon.species.url
+  );
+
+  return await response.json();
 }
 
 function renderStatsTab(
@@ -500,21 +517,27 @@ function openEvolution(
 async function getEvolutionChain(
   pokemon
 ) {
+
   const species =
-    await fetch(
-      pokemon.species.url
-    ).then(r => r.json());
+    await fetchSpecies(pokemon);
 
-  const chainUrl =
-  species.evolution_chain.url;
-
-const chain =
-  await fetch(chainUrl)
-    .then(response => response.json());
+  const chain =
+    await fetchEvolutionData(species);
 
   return extractEvolutionChainDetailed(
     chain.chain
   );
+}
+
+async function fetchEvolutionData(
+  species
+) {
+
+  const response = await fetch(
+    species.evolution_chain.url
+  );
+
+  return await response.json();
 }
 
 function registerEvolutionEvents(
@@ -538,15 +561,34 @@ function registerEvolutionEvents(
   });
 }
 
-function openEvolutionPokemon(
+async function openEvolutionPokemon(
   item,
   allPokemon
 ) {
+
   const id =
     Number(item.dataset.evo);
 
+  let pokemon =
+    allPokemon.find(
+      current => current.id === id
+    );
+
+  if (!pokemon) {
+
+    pokemon = await fetch(
+      `https://pokeapi.co/api/v2/pokemon/${id}`
+    ).then(response =>
+      response.json()
+    );
+
+    appState.allPokemon.push(
+      pokemon
+    );
+  }
+
   openPokemonOverlay(
     id,
-    allPokemon
+    appState.allPokemon
   );
 }

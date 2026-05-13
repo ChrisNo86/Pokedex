@@ -6,6 +6,17 @@ export async function fetchPokemonList(limit, offset) {
   return await res.json();
 }
 
+export async function fetchPokemonById(
+  id
+) {
+
+  const response = await fetch(
+    `https://pokeapi.co/api/v2/pokemon/${id}`
+  );
+
+  return response.json();
+}
+
 export async function fetchPokemonDetails(url) {
   const cached = getCache(pokemonCache, url);
   if (cached) return cached;
