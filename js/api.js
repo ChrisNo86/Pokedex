@@ -60,7 +60,6 @@ export function extractEvolutionChainDetailed(chain) {
   function traverse(node) {
     const url = node.species.url;
 
-    // ID aus URL ziehen
     const id = url.split('/').filter(Boolean).pop();
 
     result.push({
