@@ -8,6 +8,179 @@ body {
   color: white;
 }
 
+.main-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px 16px;
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(10,15,30,0.96),
+      rgba(20,25,45,0.92)
+    );
+
+  backdrop-filter: blur(16px);
+
+  border-bottom:
+    1px solid rgba(255,255,255,0.08);
+
+  box-shadow:
+    0 6px 24px rgba(0,0,0,0.35);
+}
+
+.main-header h1 {
+  position: relative;
+
+  margin: 0;
+
+  font-size: 34px;
+
+  letter-spacing: 4px;
+
+  font-family:
+    'Press Start 2P',
+    cursive;
+
+  color: #ffd43b;
+
+  text-shadow:
+    0 0 12px rgba(255,212,59,0.9),
+    0 0 28px rgba(255,212,59,0.5);
+
+  z-index: 2;
+}
+
+.main-header span {
+  position: relative;
+
+  margin-top: 10px;
+
+  font-size: 13px;
+
+  letter-spacing: 2px;
+
+  text-transform: uppercase;
+
+  color: rgba(255,255,255,0.7);
+
+  z-index: 2;
+}
+
+.main-header::after {
+  content: '';
+
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  width: 80%;
+  height: 1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      cyan,
+      transparent
+    );
+
+  opacity: 0.7;
+}
+
+.header-glow {
+  position: absolute;
+
+  width: 320px;
+  height: 120px;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(0,255,255,0.22),
+      transparent 70%
+    );
+
+  filter: blur(24px);
+
+  pointer-events: none;
+}
+
+.main-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+
+  flex-wrap: wrap;
+
+  padding: 24px;
+
+  margin-top: 48px;
+
+  background: rgba(10,10,20,0.9);
+
+  border-top:
+    1px solid rgba(255,255,255,0.08);
+}
+
+.main-footer button {
+  border: none;
+  background: none;
+
+  cursor: pointer;
+
+  color: rgba(255,255,255,0.7);
+
+  transition: 0.2s;
+}
+
+.main-footer button:hover {
+  color: cyan;
+}
+
+.main-footer a,
+.main-footer span {
+  font-size: 14px;
+
+  color: rgba(255,255,255,0.7);
+
+  text-decoration: none;
+
+  transition: 0.2s;
+}
+
+@media (max-width: 480px) {
+
+  .main-header {
+    padding: 16px 12px;
+  }
+
+  .main-header h1 {
+    font-size: 22px;
+    letter-spacing: 2px;
+  }
+
+  .main-header span {
+    font-size: 11px;
+  }
+
+  .header-glow {
+    width: 220px;
+  }
+}
+
 body::before {
   content: "";
   position: fixed;
@@ -30,6 +203,7 @@ body::before {
 .card {
   border-radius: 20px;
   padding: 16px;
+  z-index: 10;
   backdrop-filter: blur(12px);
   transition: all 0.25s ease;
   cursor: pointer;
@@ -149,6 +323,7 @@ body::before {
 #overlay {
   position: fixed;
   inset: 0;
+  z-index: 2000;
   background: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(10px);
   transition: opacity 0.15s ease;
@@ -714,11 +889,15 @@ body::before {
 }
 
 .controls {
+  position: sticky;
+  backdrop-filter: blur(12px);
+  top: 100px;
+  z-index: 900;
   max-width: 1440px;
   width: 100%;
   box-sizing: border-box;
   margin: auto;
-  padding: 20px;
+  padding: 12px;
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
@@ -1355,4 +1534,82 @@ body.no-scroll {
   .evo-item span {
     font-size: 11px;
   }
+}
+
+#legal-overlay {
+  position: fixed;
+  inset: 0;
+
+  display: none;
+
+  z-index: 5000;
+}
+
+#legal-overlay.show {
+  display: block;
+}
+
+.legal-backdrop {
+  position: fixed;
+  inset: 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 20px;
+
+  background:
+    rgba(0,0,0,0.7);
+
+  backdrop-filter: blur(8px);
+}
+.legal-card {
+  position: relative;
+
+  width: 100%;
+  max-width: 500px;
+
+  padding: 32px;
+
+  border-radius: 24px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #111827,
+      #1f2937
+    );
+
+  border:
+    1px solid rgba(255,255,255,0.08);
+
+  box-shadow:
+    0 10px 40px rgba(0,0,0,0.4);
+}
+.legal-close {
+  position: absolute;
+
+  top: 16px;
+  right: 16px;
+
+  width: 36px;
+  height: 36px;
+
+  border: none;
+  border-radius: 50%;
+
+  cursor: pointer;
+
+  background:
+    rgba(255,255,255,0.08);
+
+  color: white;
+
+  transition: 0.2s;
+}
+
+.legal-close:hover {
+  background:
+    rgba(0,255,255,0.2);
 }

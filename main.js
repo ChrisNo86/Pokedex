@@ -148,7 +148,27 @@ function handleEscapeKey(event) {
 
   if (closeActiveOverlay()) return;
 
+  if (closeLegalOverlay()) return;
+
   resetSearch();
+}
+
+function closeLegalOverlay() {
+  const overlay =
+    document.getElementById(
+      'legal-overlay'
+    );
+
+  const isOpen =
+    overlay?.classList.contains(
+      'show'
+    );
+
+  if (!isOpen) return false;
+
+  closeLegalPopup();
+
+  return true;
 }
 
 function closeActiveOverlay() {
@@ -456,4 +476,152 @@ function debounce(
     }, delayMilliseconds);
 
   };
+}
+
+window.openLegalPopup = type => {
+  renderLegalPopup(type);
+};
+
+window.closeLegalPopup = () => {
+  closeLegalPopup();
+};
+
+function renderLegalPopup(type) {
+  const overlay =
+    document.getElementById(
+      'legal-overlay'
+    );
+
+  overlay.innerHTML =
+    createLegalHTML(type);
+
+  registerLegalEvents(overlay);
+
+  overlay.classList.add('show');
+}
+
+function registerLegalEvents(
+  overlay
+) {
+
+  overlay.addEventListener(
+    'click',
+    closeLegalPopup
+  );
+
+  stopLegalClosing(overlay);
+}
+function closeLegalPopup() {
+  document.getElementById(
+    'legal-overlay'
+  ).classList.remove('show');
+}
+
+function stopLegalClosing(
+  overlay
+) {
+
+  const card =
+    overlay.querySelector(
+      '.legal-card'
+    );
+
+  card.addEventListener(
+    'click',
+    event => {
+      event.stopPropagation();
+    }
+  );
+}
+
+function createLegalHTML(type) {
+  return `
+    <div class="legal-backdrop">
+
+      <div class="legal-card">
+
+        <button
+          class="legal-close"
+          onclick="closeLegalPopup()"
+        >
+          ✕
+        </button>
+
+        ${getLegalContent(type)}
+
+      </div>
+
+    </div>
+  `;
+}
+
+function getLegalContent(type) {
+  return type === 'imprint'
+    ? createImprint()
+    : createPrivacy();
+}
+
+function createImprint() {
+  return `
+    <h2>Imprint</h2>
+
+    <p>
+      Christian Noack
+    </p>
+
+    <p>
+      Private Pokédex Project
+    </p>
+
+    <p>
+      Germany
+    </p>
+
+    <p>
+      Non-commercial fan project
+      for educational and
+      portfolio purposes.
+    </p>
+
+    <p>
+      Pokémon and related assets
+      belong to Nintendo,
+      Game Freak and
+      The Pokémon Company.
+    </p>
+
+     <p>
+      Company : <a href="https://christian-noack.com">https://christian-noack.com</a>
+    </p>
+  `;
+}
+
+function createPrivacy() {
+  return `
+    <h2>Privacy Policy</h2>
+
+    <p>
+      This website does not
+      collect or store
+      personal data.
+    </p>
+
+    <p>
+      No cookies, tracking
+      tools or user accounts
+      are used.
+    </p>
+
+    <p>
+      Pokémon data is provided
+      by the public PokéAPI.
+    </p>
+
+    <p>
+      This project is for
+      educational and
+      non-commercial purposes
+      only.
+    </p>
+  `;
 }
