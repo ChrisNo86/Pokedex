@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="./assets/favicon32.png">
+    <link rel="stylesheet" href="css/style.css" />
+    <title>Pokedex</title>
+  </head>
+  <body>
+    <div class="controls">
+      <input
+      id="search"
+        type="text"
+        placeholder="Search Pokémon..."
+        oninput="onSearchInput(this)"
+      />
+    <div
+  id="no-results"
+  class="no-results"
+  style="display:none;"
+>
+  <h2>No Pokémon found</h2>
+
+  <p>
+    Try another search.
+  </p>
+</div>
+      <div class="type-filter" id="type-filter"></div>
+    </div>
+    <div id="app">
+      <div id="list" class="grid"></div>
+
+     <div class="controls">
+
+  <div class="load-container">
+    <div id="load-more-container">
+  <button id="load-more" onclick="loadMore()">
+    Load More
+  </button>
+</div>
+
+    <div id="loader-text">
+      ⚡ Loading...
+    </div>
+
+  </div>
+
+</div>
+    <div id="overlay" onclick="closeOverlay()"></div>
+
+    <script type="module" src="main.js"></script>
+  </body>
+</html>

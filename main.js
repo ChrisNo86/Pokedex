@@ -3,6 +3,9 @@ import {
   fetchPokemonDetails
 } from './js/api.js';
 
+import { renderNoResults }
+  from './js/templates.js';
+
 import {
   renderPokemonCard
 } from './js/templates.js';
@@ -29,6 +32,8 @@ import {
   showPokemonOverlay
 } from './js/overlay.js';
 
+import { createCardData }
+  from './js/template-data.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   initializeApplication();
@@ -36,18 +41,45 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
 async function initializeApplication() {
-  renderTypeFilter(changeSelectedType);
-  registerGlobalFunctions();
+  initializeUI();
 
   await loadPokemonList();
+
+  toggleLoadMoreButton(true);
+}
+
+function initializeUI() {
+  renderTypeFilter(changeSelectedType);
+
+  registerGlobalFunctions();
+  initializeKeyboardShortcuts();
+  initializeCardEvents();
+
+  toggleLoadMoreButton(false);
 }
 
 
 async function loadPokemonList() {
   if (appState.isLoading) return;
 
-  setLoadingState(true);
+  appState.isLoading = true;
 
+  const initialLoad = isInitialLoad();
+
+  toggleLoader(initialLoad, true);
+
+  await fetchAndRenderPokemon();
+
+  toggleLoader(initialLoad, false);
+
+  appState.isLoading = false;
+}
+
+function isInitialLoad() {
+  return appState.allPokemon.length === 0;
+}
+
+async function fetchAndRenderPokemon() {
   const pokemonList = await fetchPokemonList(
     appState.limit,
     appState.offset
@@ -57,13 +89,39 @@ async function loadPokemonList() {
     pokemonList.results
   );
 
+  updatePokemonState(pokemonData);
+
   appendPokemonToList(pokemonData);
-
-  appState.offset += appState.limit;
-
-  setLoadingState(false);
 }
 
+function updatePokemonState(pokemonData) {
+  appState.allPokemon.push(...pokemonData);
+
+  appState.offset += appState.limit;
+}
+
+function toggleLoader(initialLoad, show) {
+  if (initialLoad) return;
+
+  const button = document.getElementById(
+    'load-more'
+  );
+
+  const loader = document.getElementById(
+    'loader-text'
+  );
+
+  button.disabled = show;
+
+  button.classList.toggle(
+    'loading',
+    show
+  );
+
+  loader.style.display = show
+    ? 'block'
+    : 'none';
+}
 
 async function fetchPokemonBatch(results) {
   const pokemonRequests = results.map(
@@ -73,29 +131,128 @@ async function fetchPokemonBatch(results) {
   return await Promise.all(pokemonRequests);
 }
 
+function initializeKeyboardShortcuts() {
+  window.addEventListener(
+    'keydown',
+    handleEscapeKey
+  );
+}
 
-function appendPokemonToList(pokemonArray) {
-  appState.allPokemon.push(...pokemonArray);
+function handleEscapeKey(event) {
+  if (event.key !== 'Escape') return;
 
-  renderPokemonList(pokemonArray, true);
+  if (closeActiveOverlay()) return;
+
+  resetSearch();
+}
+
+function closeActiveOverlay() {
+  const overlay =
+    document.getElementById('overlay');
+
+  const isOpen =
+    overlay?.classList.contains('show');
+
+  if (!isOpen) return false;
+
+  closePokemonOverlay();
+
+  return true;
+}
+
+function resetSearch() {
+  const searchInput =
+    document.getElementById('search');
+
+  const hasValue =
+    searchInput?.value.trim() !== '';
+
+  if (!hasValue) return;
+
+  searchInput.value = '';
+
+  appState.searchTerm = '';
+
+  renderFilteredPokemonList();
+
+  showNoResults(false);
+
+  toggleLoadMoreButton(true);
+}
+
+function appendPokemonToList(
+  pokemonArray
+) {
+
+  renderPokemonList(
+    pokemonArray,
+    true
+  );
 }
 
 
-function renderPokemonList(pokemonArray, append = false) {
-  const container = document.getElementById('list');
+function renderPokemonList(
+  pokemonArray,
+  append = false
+) {
+  const container =
+    document.getElementById('list');
 
   if (!append) {
     container.innerHTML = '';
   }
 
-  container.innerHTML += pokemonArray
-    .map(pokemon => renderPokemonCard(pokemon))
+  const html = pokemonArray
+    .map(createCardData)
+    .map(renderPokemonCard)
     .join('');
+
+  container.innerHTML += html;
+}
+
+function toggleLoadMoreButton(show) {
+  const buttonContainer = document.getElementById('load-more-container');
+
+  if (!buttonContainer) return;
+
+  buttonContainer.style.display = show
+    ? 'flex'
+    : 'none';
 }
 
 
+function showNoResults(show) {
+  const noResults = document.getElementById('no-results');
+
+  if (!noResults) return;
+
+  noResults.style.display = show
+    ? 'block'
+    : 'none';
+}
+
 function renderFilteredPokemonList() {
-  const filteredPokemon = getFilteredPokemon();
+  const filteredPokemon =
+    getFilteredPokemon();
+
+  const hasResults =
+    filteredPokemon.length > 0;
+
+  const isSearching =
+    appState.searchTerm !== '';
+
+  const hasFilter =
+    appState.selectedType !== 'all';
+
+  showNoResults(
+    !hasResults &&
+    (isSearching || hasFilter)
+  );
+
+  toggleLoadMoreButton(
+    !isSearching &&
+    !hasFilter
+  );
 
   renderPokemonList(filteredPokemon);
 }
@@ -110,64 +267,58 @@ function changeSelectedType(type) {
 
 
 const handleSearchInput = debounce(searchValue => {
-  appState.searchTerm = searchValue.toLowerCase();
+  const value =
+    searchValue.toLowerCase().trim();
+
+  if (value.length < 3) {
+    appState.searchTerm = '';
+
+    renderFilteredPokemonList();
+    return;
+  }
+
+  appState.searchTerm = value;
 
   renderFilteredPokemonList();
 }, 300);
 
 
 function registerGlobalFunctions() {
-  window.openOverlay = pokemonId => {
-    openPokemonOverlay(
-      pokemonId,
-      appState.allPokemon
-    );
-  };
+  registerOverlayFunctions();
 
-  window.closeOverlay = () => {
-    closePokemonOverlay();
-  };
+  registerNavigationFunctions();
 
-  window.switchTab = async tab => {
-    await switchOverlayTab(
-      tab,
-      appState.allPokemon
-    );
-  };
-
-  window.toggleFilterMenu = () => {
-    toggleFilterMenu();
-  };
-
-  window.onSearchInput = input => {
-    handleSearchInput(input.value);
-  };
-
-  window.loadMore = async () => {
-    await loadMorePokemon();
-  };
-
-  window.nextPokemon = async () => {
-    await changePokemon(1);
-  };
-
-  window.prevPokemon = async () => {
-    await changePokemon(-1);
-  };
-
-  window.openFromEvolution = async pokemonId => {
-    const index = appState.allPokemon.findIndex(
-      pokemon => pokemon.id === pokemonId
-    );
-
-    if (index === -1) return;
-
-    appState.currentIndex = index;
-
-    await showPokemonOverlay(appState.allPokemon);
-  };
+  registerSearchFunctions();
 }
 
+function registerOverlayFunctions() {
+  window.openOverlay = openOverlay;
+
+  window.closeOverlay = closePokemonOverlay;
+
+  window.switchTab = switchOverlay;
+
+  window.openFromEvolution =
+    openEvolutionPokemon;
+}
+
+function registerNavigationFunctions() {
+  window.loadMore = loadMorePokemon;
+
+  window.nextPokemon = () =>
+    changePokemon(1);
+
+  window.prevPokemon = () =>
+    changePokemon(-1);
+}
+
+function registerSearchFunctions() {
+  window.toggleFilterMenu =
+    toggleFilterMenu;
+
+  window.onSearchInput = input =>
+    handleSearchInput(input.value);
+}
 
 async function changePokemon(direction) {
   appState.currentIndex += direction;
@@ -187,33 +338,111 @@ async function changePokemon(direction) {
   await showPokemonOverlay(appState.allPokemon);
 }
 
+function openOverlay(pokemonId) {
+  openPokemonOverlay(
+    pokemonId,
+    appState.allPokemon
+  );
+}
+
+async function switchOverlay(tab) {
+  await switchOverlayTab(
+    tab,
+    appState.allPokemon
+  );
+}
+
+async function openEvolutionPokemon(
+  pokemonId
+) {
+
+  const index = findPokemonIndex(
+    pokemonId
+  );
+
+  if (index === -1) return;
+
+  appState.currentIndex = index;
+
+  await showPokemonOverlay(
+    appState.allPokemon
+  );
+}
+
+function findPokemonIndex(pokemonId) {
+  return appState.allPokemon.findIndex(
+    pokemon => pokemon.id === pokemonId
+  );
+}
 
 async function loadMorePokemon() {
-  if (appState.isLoading) return;
 
-  const button = document.getElementById('load-more');
-  const loader = document.getElementById('loader-text');
+  const button =
+    document.getElementById(
+      'load-more'
+    );
+
+  const loader =
+    document.getElementById(
+      'loader-text'
+    );
 
   button.disabled = true;
-  loader.style.display = 'block';
 
-  await delay(1000);
+  button.classList.add(
+    'loading'
+  );
+
+  loader.style.display =
+    'block';
+
+  await delay(2000);
 
   await loadPokemonList();
 
-  loader.style.display = 'none';
   button.disabled = false;
+
+  button.classList.remove(
+    'loading'
+  );
+
+  loader.style.display =
+    'none';
 }
 
+function initializeCardEvents() {
+  const list = document.getElementById('list');
 
-function debounce(callback, delayMilliseconds) {
+  list.addEventListener('click', event => {
+    const card = event.target.closest('.card');
+
+    if (!card) return;
+
+    const id = Number(card.dataset.id);
+
+    openPokemonOverlay(
+      id,
+      appState.allPokemon
+    );
+  });
+}
+
+function debounce(
+  callback,
+  delayMilliseconds
+) {
+
   let timeoutId;
 
   return (...args) => {
+
     clearTimeout(timeoutId);
 
     timeoutId = setTimeout(() => {
+
       callback(...args);
+
     }, delayMilliseconds);
+
   };
 }
