@@ -296,12 +296,18 @@ const handleSearchInput = debounce(searchValue => {
     searchValue.toLowerCase().trim();
 
   if (value.length < 3) {
-    appState.searchTerm = '';
 
-    renderFilteredPokemonList();
-    return;
-  }
+  toggleSearchHint(
+    value.length > 0
+  );
 
+  appState.searchTerm = '';
+
+  renderFilteredPokemonList();
+
+  return;
+}
+toggleSearchHint(false);
   appState.searchTerm = value;
 
   renderFilteredPokemonList();
@@ -624,4 +630,14 @@ function createPrivacy() {
       only.
     </p>
   `;
+}
+
+function toggleSearchHint(show) {
+  const hint =
+    document.getElementById(
+      'search-hint'
+    );
+
+  hint.style.display =
+    show ? 'block' : 'none';
 }
