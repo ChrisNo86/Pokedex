@@ -1,5 +1,5 @@
-import { pokemonTypes, getTypeIcon } from '/js/utils.js';
-import { appState } from '/js/state.js';
+import { pokemonTypes, getTypeIcon } from './utils.js';
+import { appState } from './state.js';
 
 export function renderTypeFilter(onTypeChange) {
   const container = document.getElementById('type-filter');

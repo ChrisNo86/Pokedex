@@ -1,4 +1,4 @@
-import { appState } from '/js/state.js';
+import { appState } from './state.js';
 
 export function setLoadingState(isLoading) {
   appState.isLoading = isLoading;

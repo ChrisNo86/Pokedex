@@ -1,4 +1,4 @@
-import { pokemonCache, evolutionCache, getCache, setCache } from '/js/cache.js';
+import { pokemonCache, evolutionCache, getCache, setCache } from './cache.js';
 
 export async function fetchPokemonList(limit, offset) {
   const url = `https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`;
@@ -31,7 +31,6 @@ export async function fetchEvolutionChain(speciesUrl) {
   return evoData;
 }
 
-// api.js ergänzen
 export function extractEvolutionChain(chain) {
   const result = [];
 
